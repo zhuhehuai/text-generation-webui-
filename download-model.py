@@ -20,6 +20,7 @@ import tqdm
 from tqdm.contrib.concurrent import thread_map
 
 
+# 选择默认选项中的模型
 def select_model_from_default_options():
     models = {
         "OPT 6.7B": ("facebook", "opt-6.7b", "main"),
@@ -36,26 +37,26 @@ def select_model_from_default_options():
     }
     choices = {}
 
-    print("Select the model that you want to download:\n")
+    print("选择您要下载的模型：\n")
     for i, name in enumerate(models):
         char = chr(ord('A') + i)
         choices[char] = name
         print(f"{char}) {name}")
     char = chr(ord('A') + len(models))
-    print(f"{char}) None of the above")
+    print(f"{char}) 以上都不是")
 
     print()
-    print("Input> ", end='')
+    print("输入> ", end='')
     choice = input()[0].strip().upper()
     if choice == char:
-        print("""\nThen type the name of your desired Hugging Face model in the format organization/name.
+        print("""\n然后以 组织/模型名字 的格式输入所需的拥抱面模型的名称。
 
-Examples:
+例如:
 facebook/opt-1.3b
 EleutherAI/pythia-1.4b-deduped
 """)
 
-        print("Input> ", end='')
+        print("输入> ", end='')
         model = input()
         branch = "main"
     else:
@@ -74,7 +75,7 @@ def sanitize_model_and_branch_names(model, branch):
     else:
         pattern = re.compile(r"^[a-zA-Z0-9._-]+$")
         if not pattern.match(branch):
-            raise ValueError("Invalid branch name. Only alphanumeric characters, period, underscore and dash are allowed.")
+            raise ValueError("分支名称无效。仅允许使用字母数字字符、句点、下划线和破折号。")
 
     return model, branch
 
@@ -213,7 +214,7 @@ def check_model_files(model, branch, links, sha256, output_folder):
         fpath = (output_folder / sha256[i][0])
 
         if not fpath.exists():
-            print(f"The following file is missing: {fpath}")
+            print(f"缺少以下文件: {fpath}")
             validated = False
             continue
 
@@ -221,27 +222,27 @@ def check_model_files(model, branch, links, sha256, output_folder):
             bytes = f.read()
             file_hash = hashlib.sha256(bytes).hexdigest()
             if file_hash != sha256[i][1]:
-                print(f'Checksum failed: {sha256[i][0]}  {sha256[i][1]}')
+                print(f'校验和失败: {sha256[i][0]}  {sha256[i][1]}')
                 validated = False
             else:
-                print(f'Checksum validated: {sha256[i][0]}  {sha256[i][1]}')
+                print(f'校验和已验证: {sha256[i][0]}  {sha256[i][1]}')
 
     if validated:
-        print('[+] Validated checksums of all model files!')
+        print('[+] 所有模型文件的验证校验和!')
     else:
-        print('[-] Invalid checksums. Rerun download-model.py with the --clean flag.')
+        print('[-] 校验和无效。使用 --clean 标志重新运行 download-model.py。')
 
 
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
     parser.add_argument('MODEL', type=str, default=None, nargs='?')
-    parser.add_argument('--branch', type=str, default='main', help='Name of the Git branch to download from.')
-    parser.add_argument('--threads', type=int, default=1, help='Number of files to download simultaneously.')
-    parser.add_argument('--text-only', action='store_true', help='Only download text files (txt/json).')
-    parser.add_argument('--output', type=str, default=None, help='The folder where the model should be saved.')
-    parser.add_argument('--clean', action='store_true', help='Does not resume the previous download.')
-    parser.add_argument('--check', action='store_true', help='Validates the checksums of model files.')
+    parser.add_argument('--branch', type=str, default='main', help='要从中下载的 Git 分支的名称。')
+    parser.add_argument('--threads', type=int, default=1, help='同时下载的文件数。')
+    parser.add_argument('--text-only', action='store_true', help='仅下载文本文件 (txt/json)。')
+    parser.add_argument('--output', type=str, default=None, help='应保存模型的文件夹。')
+    parser.add_argument('--clean', action='store_true', help='不恢复以前的下载。')
+    parser.add_argument('--check', action='store_true', help='验证模型文件的校验和。')
     args = parser.parse_args()
 
     branch = args.branch
