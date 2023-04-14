@@ -1,4 +1,4 @@
-# Text generation web UI
+# Text generation web UI 汉化版
 
 A gradio web UI for running Large Language Models like LLaMA, llama.cpp, GPT-J, Pythia, OPT, and GALACTICA.
 
